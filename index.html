@@ -427,7 +427,7 @@
         score = 0;
         objects = [];
         gameActive = true;
-        timeLeft = 60;
+        timeLeft = 30;
         updateUI();
         document.getElementById('timer').innerText = timeLeft;
         timerInterval = setInterval(() => {
@@ -460,7 +460,7 @@
         btnNo.innerText = taunts[Math.floor(Math.random() * taunts.length)];
         btnNo.style.position = 'fixed';
         
-        const safePad = 60; 
+        const safePad = 30; 
         const btnW = btnNo.offsetWidth;
         const btnH = btnNo.offsetHeight;
         const w = window.innerWidth;
