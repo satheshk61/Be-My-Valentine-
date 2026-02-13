@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Be My Valentine? ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Outfit:wght@400;600;800&display=swap');
+
+        :root {
+            --primary: #ff3366;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-highlight: rgba(255, 255, 255, 0.7);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --shadow-deep: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a18cd1 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+            font-family: 'Outfit', sans-serif;
+            touch-action: none;
+            user-select: none;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- UI Overlay --- */
+        #game-ui {
+            position: absolute;
+            top: max(20px, env(safe-area-inset-top));
+            left: 20px;
+            right: 20px;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(255,255,255,0.6);
+            border-left: 1px solid rgba(255,255,255,0.6);
+            padding: 10px 20px;
+            border-radius: 50px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-track {
+            width: 100px;
+            height: 12px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        #love-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff7eb3, #ff758c);
+            box-shadow: 0 0 15px #ff758c;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+        
+        #love-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+            border-radius: 20px;
+        }
+
+        /* --- Screens --- */
+        .screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(255,255,255,0.8);
+            border-left: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            padding: 40px 30px;
+            border-radius: 40px;
+            width: 85%;
+            max-width: 380px;
+            z-index: 20;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.8rem;
+            margin: 0 0 15px 0;
+            background: linear-gradient(to bottom, #ff3366, #ff5e62);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 2px rgba(255, 255, 255, 0.5));
+        }
+
+        p { 
+            color: #4a4a4a; 
+            font-size: 1.15rem; 
+            font-weight: 600;
+            line-height: 1.6; 
+            margin-bottom: 30px; 
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+        }
+
+        /* --- Glossy Buttons --- */
+        button {
+            background: linear-gradient(145deg, #ff6b81, #ff3366);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 3px 5px rgba(255,255,255,0.5), 
+                inset 0 -3px 5px rgba(0,0,0,0.1), 
+                0 10px 20px rgba(255, 51, 102, 0.4), 
+                0 0 0 4px rgba(255, 255, 255, 0.3); 
+            transition: transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+            min-width: 140px;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+            border-radius: 40px 40px 60px 60px / 30px;
+            pointer-events: none;
+        }
+
+        button:active { 
+            transform: scale(0.95); 
+            box-shadow: 0 5px 10px rgba(255, 51, 102, 0.3);
+        }
+
+        #btn-no {
+            background: linear-gradient(145deg, #b2bec3, #636e72);
+            box-shadow: 
+                inset 0 3px 5px rgba(255,255,255,0.5),
+                inset 0 -3px 5px rgba(0,0,0,0.2),
+                0 10px 20px rgba(0,0,0,0.2),
+                0 0 0 4px rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+            position: relative; 
+            transition: top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .hidden { display: none !important; }
+
+        .proposal-area {
+            min-height: 220px; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #btn-yes { z-index: 50; transition: all 0.3s ease; }
+
+        /* --- Letter Styling --- */
+        #letter-screen {
+            background: #fffdf5;
+            background-image: radial-gradient(#d4c4a8 1px, transparent 1px);
+            background-size: 20px 20px;
+            border: 8px solid #fff;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .letter-content {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            line-height: 1.6;
+            color: #5d4037;
+            text-align: left;
+            padding: 25px;
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-ui" class="hidden">
+        <div class="glass-pill">
+            <div class="progress-track"><div id="love-bar"></div></div>
+        </div>
+        <div class="glass-pill">
+            ⏳ <span id="timer">30</span>
+        </div>
+    </div>
+
+    <div id="start-screen" class="screen">
+        <h1>Love Rush</h1>
+        <p>Catch hearts. Avoid rocks.<br>Fill the liquid love meter!</p>
+        <button onclick="startGame()">Start</button>
+    </div>
+
+    <div id="game-over-screen" class="screen hidden">
+        <h1>Time's Up! 💔</h1>
+        <p>Love requires persistence...</p>
+        <button onclick="startGame()">Try Again</button>
+    </div>
+
+    <div id="proposal-screen" class="screen hidden">
+        <h1>You Won! 🎉</h1>
+        <p>I have a very important question...</p>
+        <h2 style="color: #ff3366; font-size: 2.2rem; margin: 20px 0; text-shadow: 0 2px 5px rgba(255,255,255,0.5);">Will you be my Valentine?</h2>
+        
+        <div class="proposal-area">
+            <button id="btn-yes" onclick="sayYes()">YES! 😍</button>
+            <button id="btn-no" onmouseover="trollMove()" ontouchstart="trollMove()" onclick="trollMove()">No 😢</button>
+        </div>
+    </div>
+
+    <div id="success-screen" class="screen hidden">
+        <h1 style="font-size: 4rem;">YAY!!! ❤️</h1>
+        <p>Best. Decision. Ever.</p>
+        <button onclick="openLetter()">💌 Read Letter</button>
+    </div>
+
+    <div id="letter-screen" class="screen hidden">
+        <h1 style="font-size: 2.5rem;">My Dearest Sameera🎀</h1>
+        <div class="letter-content">
+            <p>From the moment I met you, everything changed.</p>
+            <p>You make me laugh harder, smile bigger, and live better.</p>
+            <p>I can't imagine this day without you.</p>
+            <p>Happy Valentine's Day! ❤️</p>
+        </div>
+        <button onclick="location.reload()">Close</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // --- CONFIG & STATE ---
+    let width, height, dpr;
+    let objects = [];
+    let score = 0;
+    const maxScore = 100;
+    let gameActive = false;
+    let animationId;
+    let timeLeft = 30;
+    let timerInterval;
+
+    const player = { x: 0, y: 0, targetX: 0, width: 80, height: 80, sprite: '🧺' };
+
+    // --- RESPONSIVE SETUP ---
+    function resize() {
+        dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        
+        ctx.scale(dpr, dpr);
+
+        const scaleFactor = Math.min(width, height) / 400;
+        player.width = 75 * Math.max(0.8, Math.min(1.3, scaleFactor));
+        player.height = player.width;
+        
+        player.y = height - player.height - 40; 
+        player.x = width / 2;
+        player.targetX = width / 2;
+    }
+    
+    window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', () => setTimeout(resize, 100));
+    resize();
+
+    // --- INPUT HANDLING ---
+    function handleInput(clientX) {
+        if (!gameActive) return;
+        let x = clientX;
+        if (x < player.width/2) x = player.width/2;
+        if (x > width - player.width/2) x = width - player.width/2;
+        player.targetX = x - player.width / 2;
+    }
+
+    window.addEventListener('mousemove', e => handleInput(e.clientX));
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); handleInput(e.touches[0].clientX); }, {passive: false});
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); handleInput(e.touches[0].clientX); }, {passive: false});
+
+    // --- GAME ENGINE ---
+    class GameObject {
+        constructor() {
+            this.size = Math.random() * 30 + 40; 
+            this.x = Math.random() * (width - this.size - 20) + 10;
+            this.y = -this.size;
+            this.speed = (height / 150) + Math.random() * 5 + (score / 10);
+            this.isBad = Math.random() < 0.2; 
+            this.text = this.isBad ? '🪨' : ['❤️','💖','💕','🌹','💌'][Math.floor(Math.random()*5)];
+            this.angle = 0;
+            this.spin = (Math.random() - 0.5) * 0.2;
+        }
+
+        update() {
+            this.y += this.speed;
+            this.angle += this.spin;
+            if (!this.isBad) this.x += Math.sin(this.y / 50) * 1.5;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x + this.size/2, this.y + this.size/2);
+            ctx.rotate(this.angle);
+            ctx.font = `${this.size}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowColor = "rgba(0,0,0,0.1)";
+            ctx.shadowBlur = 5;
+            ctx.fillText(this.text, 0, 0);
+            ctx.restore();
+        }
+    }
+
+    function updateGame() {
+        player.x += (player.targetX - player.x) * 0.2;
+
+        const spawnChance = width < 600 ? 0.05 : 0.08;
+        if (Math.random() < spawnChance) objects.push(new GameObject());
+
+        for (let i = objects.length - 1; i >= 0; i--) {
+            let o = objects[i];
+            o.update();
+
+            if (o.y + o.size/2 > player.y + 10 && 
+                o.x + o.size/2 > player.x && 
+                o.x - o.size/2 < player.x + player.width) {
+                
+                if (o.isBad) {
+                    score = Math.max(0, score - 15);
+                    if(navigator.vibrate) navigator.vibrate(50);
+                    canvas.style.transform = `translateX(${Math.random()*10-5}px)`;
+                    setTimeout(() => canvas.style.transform = 'none', 50);
+                } else {
+                    score += 5;
+                }
+                
+                updateUI();
+                objects.splice(i, 1);
+                if (score >= maxScore) endGame(true);
+                continue;
+            }
+
+            if (o.y > height + 50) objects.splice(i, 1);
+        }
+    }
+
+    function drawGame() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.save();
+        ctx.shadowColor = "rgba(0,0,0,0.2)";
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetY = 10;
+        ctx.font = `${player.width}px Arial`;
+        ctx.fillText(player.sprite, player.x, player.y + player.height - 10);
+        ctx.restore();
+        objects.forEach(o => o.draw());
+    }
+
+    function loop() {
+        if (!gameActive) return;
+        updateGame();
+        drawGame();
+        animationId = requestAnimationFrame(loop);
+    }
+
+    // --- UI FUNCTIONS ---
+    function updateUI() {
+        const pct = Math.min(100, (score / maxScore) * 100);
+        document.getElementById('love-bar').style.width = `${pct}%`;
+    }
+
+    function startGame() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+        document.getElementById('game-ui').classList.remove('hidden');
+        score = 0;
+        objects = [];
+        gameActive = true;
+        timeLeft = 60;
+        updateUI();
+        document.getElementById('timer').innerText = timeLeft;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft;
+            if (timeLeft <= 0) endGame(false);
+        }, 1000);
+        loop();
+    }
+
+    function endGame(won) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        cancelAnimationFrame(animationId);
+        document.getElementById('game-ui').classList.add('hidden');
+        if (won) document.getElementById('proposal-screen').classList.remove('hidden');
+        else document.getElementById('game-over-screen').classList.remove('hidden');
+    }
+
+    // --- SMART TROLL BUTTON (AVOIDS YES BUTTON) ---
+    const taunts = [
+        "Too slow! 😜", "Missed me!", "Nice try!",
+        "Nope!", "Not here!", "Too fast?", "Try again!"
+    ];
+
+    function trollMove() {
+        const btnNo = document.getElementById('btn-no');
+        const btnYes = document.getElementById('btn-yes');
+
+        btnNo.innerText = taunts[Math.floor(Math.random() * taunts.length)];
+        btnNo.style.position = 'fixed';
+        
+        const safePad = 60; 
+        const btnW = btnNo.offsetWidth;
+        const btnH = btnNo.offsetHeight;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        // Get coordinates of YES button to avoid it
+        const yesRect = btnYes.getBoundingClientRect();
+        const yesCenterX = yesRect.left + yesRect.width/2;
+        const yesCenterY = yesRect.top + yesRect.height/2;
+
+        // Define corners
+        const corners = [
+            { x: safePad, y: safePad + 40 }, 
+            { x: w - btnW - safePad, y: safePad + 40 },
+            { x: safePad, y: h - btnH - safePad }, 
+            { x: w - btnW - safePad, y: h - btnH - safePad }
+        ];
+
+        // Filter out corners that are too close to the YES button
+        // "Safe distance" is roughly 150px
+        const safeCorners = corners.filter(c => {
+            const dist = Math.hypot(c.x - yesCenterX, c.y - yesCenterY);
+            return dist > 150; 
+        });
+
+        // Pick from safe corners, or fallback to any corner if somehow all are blocked
+        const finalCorners = safeCorners.length > 0 ? safeCorners : corners;
+        const corner = finalCorners[Math.floor(Math.random() * finalCorners.length)];
+
+        btnNo.style.left = corner.x + 'px';
+        btnNo.style.top = corner.y + 'px';
+
+        let currentSize = parseFloat(window.getComputedStyle(btnYes).fontSize);
+        if (currentSize < 60) {
+            btnYes.style.fontSize = (currentSize * 1.2) + 'px';
+            btnYes.style.padding = (parseFloat(window.getComputedStyle(btnYes).padding) * 1.1) + 'px';
+        }
+    }
+
+    function sayYes() {
+        document.getElementById('proposal-screen').classList.add('hidden');
+        document.getElementById('success-screen').classList.remove('hidden');
+        fireConfetti();
+    }
+
+    function openLetter() {
+        document.getElementById('success-screen').classList.add('hidden');
+        document.getElementById('letter-screen').classList.remove('hidden');
+    }
+
+    function fireConfetti() {
+        const colors = ['#ff3366', '#ff6b81', '#ffffff'];
+        for (let i = 0; i < 60; i++) {
+            const c = document.createElement('div');
+            c.style.position = 'fixed';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.top = '-10px';
+            c.style.width = Math.random() * 8 + 4 + 'px';
+            c.style.height = c.style.width;
+            c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            c.style.borderRadius = '50%';
+            c.style.zIndex = '999';
+            c.style.pointerEvents = 'none';
+            document.body.appendChild(c);
+            
+            c.animate([
+                { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(100vh) rotate(${Math.random()*360}deg)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 1500 + 1500,
+                easing: 'linear'
+            }).onfinish = () => c.remove();
+        }
+    }
+</script>
+</body>
+</html>
